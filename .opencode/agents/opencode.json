@@ -1,0 +1,56 @@
+// OpenCode example config for MLX
+{
+	"$schema": "https://opencode.ai/config.json",
+	"model": "mlx/default_model",
+	"small_model": "mlx/default_model",
+	"provider": {
+		"mlx": {
+			"npm": "@ai-sdk/openai-compatible",
+			"name": "MLX (local)",
+			"options": {
+				"baseURL": "http://127.0.0.1:8080/v1"
+			},
+			"models": {
+				"default_model": {
+					"name": "Default MLX Model"
+				}
+			}
+		}
+	},
+	"agent": {
+		"build": {
+		  "mode": "primary",
+		  "model": "mlx/default_model",
+		  "prompt": "{file:./prompts/build.txt}",
+		  "temperature": 0.1,
+		  "tools": {
+			"write": true,
+			"edit": true,
+			"bash": true
+		  }
+		},
+		"plan": {
+		  "mode": "primary",
+		  "model": "mlx/default_model",
+		  "temperature": 0.1,
+		  "tools": {
+			"write": false,
+			"edit": false,
+			"bash": false
+		  }
+		},
+		"code-reviewer": {
+			"description": "Reviews code for best practices and potential issues",
+			"mode": "subagent",
+			"model": "mlx/default_model",
+			"prompt": "You are a code reviewer. Focus on security, performance, and maintainability.",
+			"tools": {
+				"write": false,
+				"edit": false
+			}
+		},
+		"creative": {
+		  "temperature": 0.8
+		}
+	}
+}

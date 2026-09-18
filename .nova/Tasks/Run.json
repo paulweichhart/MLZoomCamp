@@ -1,0 +1,10 @@
+{
+  "actions" : {
+    "run" : {
+      "enabled" : true,
+      "script" : "python3 src\/Homework1\/main.py"
+    }
+  },
+  "openLogOnRun" : "finish",
+  "persistent" : true
+}
