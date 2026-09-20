@@ -22,8 +22,8 @@ print(f"\n4. How many columns have missing values: {df.isnull().any().sum()}")
 
 print(f"\n5. Maximum fuel efficiency of cars from Asia: {df[df['origin'] == 'Asia']['fuel_efficiency_mpg'].max()}")
 
-med = df['horsepower'].median()
-print(f"\n6. Median Horsepower: {med}")
-print(f"   Most Frequent: {df['horsepower'].mode()}")
-df['horsepower'] = df['horsepower'].fillna(med)
+freq = df['horsepower'].mode()
+print(f"\n6. Median Horsepower: {df['horsepower'].median()}")
+print(f"   Most Frequent: {freq}")
+df['horsepower'] = df['horsepower'].fillna(freq)
 print(f"\n   New Median Horsepower: {df['horsepower'].median()}")
