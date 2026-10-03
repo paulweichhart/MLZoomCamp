@@ -1,31 +1,63 @@
 import pandas as pd
 import numpy as np
 
-import seaborn as sns
-from matplotlib import pyplot as plt
-
-df = pd.read_csv('src/Homework2/car_fuel_efficiency_2026.csv')
-
-print(len(df))
-print(df.head())
-
-plt.figure(figsize=(6, 4))
-
-sns.histplot(df.fuel_efficiency_mpg, bins=40, color='black', alpha=1)
-plt.xlabel('MPG')
-plt.title('Fuel Efficieny')
-
-# plt.show()
-
-print(f"min: {df.fuel_efficiency_mpg.min()} max: {df.fuel_efficiency_mpg.max()}")
+from RegressionUtils import *
 
 BASE = ['engine_displacement', 'horsepower', 'vehicle_weight', 'model_year', 'fuel_efficiency_mpg']
+df = pd.read_csv('data/car_fuel_efficiency_2026.csv')
 
-def prepare_data(data):
-	df_data = data[BASE]
-	print(df_data.isnull().any())
-	# df_data = df_data.fillna(0)
-	return df_data.values
+print("# Exploring Data")
+RegressionUtils.explore_data(df, 'fuel_efficiency_mpg')
+
+print(f"# 1. DataFrame: {df[BASE].isnull().any()}")
+
+median = df['horsepower'].median()
+print(f" # 2. MEDIAN: {median} Horsepower")
+
+mean = df['horsepower'].mean()
+print(f" # 2. MEAN: {mean} Horsepower")
+
+df_train, df_val, df_test = RegressionUtils.split_data(df[BASE])
+
+y_train, y_val, y_test = RegressionUtils.prepare_target(df_train, df_val, df_test, 'fuel_efficiency_mpg')
+
+X_train, X_val, X_test = RegressionUtils.prepare_data(df_train, df_val, df_test, 'fuel_efficiency_mpg', 0)
+
+w0, w = RegressionUtils.train_linear_regression(X_train, y_train)
+y_pred = w0 + X_val.dot(w)
+print(f"# 3. RMSE: {round(RegressionUtils.rmse(y_val, y_pred), 3)}")
+
+for r in [0, 0.01, 0.1, 1, 5, 10, 100]:
+	w0, w = RegressionUtils.train_linear_regression_r(X_train, y_train, r)
+	y_pred = w0 + X_val.dot(w)
+	print(f"# 4. R: {r} RMSE: {round(RegressionUtils.rmse(y_val, y_pred), 4)}")
+
+
+rmse = np.zeros(10)
+for seed in [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]:
+	df_train, df_val, df_test = RegressionUtils.split_data(df[BASE], seed)
 	
-training_data = prepare_data(df)
-print(training_data[:5])
+	y_train, y_val, y_test = RegressionUtils.prepare_target(df_train, df_val, df_test, 'fuel_efficiency_mpg')
+	
+	X_train, X_val, X_test = RegressionUtils.prepare_data(df_train, df_val, df_test, 'fuel_efficiency_mpg', 0)
+	
+	w0, w = RegressionUtils.train_linear_regression(X_train, y_train)
+	y_pred = w0 + X_val.dot(w)
+	rmse[seed] = RegressionUtils.rmse(y_val, y_pred)
+	
+print(f"# 5. STD: {round(np.std(rmse), 3)}")
+
+
+df_train, df_val, df_test = RegressionUtils.split_data(df[BASE], 9)
+y_train, y_val, y_test = RegressionUtils.prepare_target(df_train, df_val, df_test, 'fuel_efficiency_mpg')
+
+X_train, X_val, X_test = RegressionUtils.prepare_data(df_train, df_val, df_test, 'fuel_efficiency_mpg', 0)
+
+print(X_train, X_val)
+
+X_full = np.concatenate([X_train, X_val])
+y_full = np.concatenate([y_train, y_val])
+
+w0, w = RegressionUtils.train_linear_regression_r(X_full, y_full, 0.001)
+y_pred = w0 + X_test.dot(w)
+print(f"# 6. RMSE: {round(RegressionUtils.rmse(y_test, y_pred), 3)}")

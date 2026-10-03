@@ -14,7 +14,7 @@ from matplotlib import pyplot as plt
 # In[2]:
 
 
-df = pd.read_csv('data.csv')
+df = pd.read_csv('data/data.csv')
 len(df)
 
 # In[3]:
@@ -115,9 +115,9 @@ y_train_orig = df_train.msrp.values
 y_val_orig = df_val.msrp.values
 y_test_orig = df_test.msrp.values
 
-y_train = np.log1p(df_train.msrp.values)
-y_val = np.log1p(df_val.msrp.values)
-y_test = np.log1p(df_test.msrp.values)
+y_train = df_train.msrp.values
+y_val = df_val.msrp.values
+y_test = df_test.msrp.values
 
 del df_train['msrp']
 del df_val['msrp']

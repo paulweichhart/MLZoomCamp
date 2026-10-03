@@ -1,0 +1,86 @@
+import pandas as pd
+import numpy as np
+
+import seaborn as sns
+from matplotlib import pyplot as plt
+
+class RegressionUtils:
+
+    @staticmethod
+    def explore_data(data, column):
+        print(len(data))
+        print(data.head())
+        
+        plt.figure(figsize=(6, 4))
+        
+        sns.histplot(data[column], bins=40, color='black', alpha=1)
+        plt.xlabel(column)
+        plt.title(column)
+        
+        # plt.show()
+        
+        print(f"min: {data[column].min()} max: {data[column].max()}")
+
+    @staticmethod
+    def split_data(df_data, seed=42):        
+        n = len(df_data)
+        n_val = int(n * 0.2)
+        n_test = int(n * 0.2)
+        n_train = n - n_val - n_test
+        
+        np.random.seed(seed)
+        idx = np.arange(n)
+        np.random.shuffle(idx)
+        df_shuffled = df_data.iloc[idx]
+        
+        df_train = df_shuffled.iloc[idx[:n_train]].reset_index(drop=True)
+        df_val = df_shuffled.iloc[idx[n_train:n_train + n_val]].reset_index(drop=True)
+        df_test = df_shuffled.iloc[idx[n_train + n_val:]].reset_index(drop=True)
+        
+        return df_train, df_val, df_test
+
+    @staticmethod
+    def prepare_target(df_train, df_val, df_test, column):
+        y_train = df_train[column].values
+        y_val = df_val[column].values
+        y_test = df_test[column].values
+        return y_train, y_val, y_test 
+        
+    @staticmethod
+    def prepare_data(df_train, df_val, df_test, column, fillna=0):
+        del df_train[column]
+        del df_val[column]
+        del df_test[column]
+        
+        return df_train.fillna(fillna).values, df_val.fillna(fillna).values, df_test.fillna(fillna).values
+
+    @staticmethod
+    def train_linear_regression_r(X, y, r=0.0):
+        ones = np.ones(X.shape[0])
+        X = np.column_stack([ones, X])
+
+        XTX = X.T.dot(X)
+        reg = r * np.eye(XTX.shape[0])
+        XTX = XTX + reg
+        
+        XTX_inv = np.linalg.inv(XTX)
+        w = XTX_inv.dot(X.T).dot(y)
+
+        return w[0], w[1:]
+        
+    @staticmethod
+    def train_linear_regression(X, y):
+        ones = np.ones(X.shape[0])
+        X = np.column_stack([ones, X])
+    
+        XTX = X.T.dot(X)
+        XTX_inv = np.linalg.inv(XTX)
+        w = XTX_inv.dot(X.T).dot(y)
+    
+        return w[0], w[1:]
+
+    @staticmethod
+    def rmse(y, y_pred):
+        error = y_pred - y
+        mse = (error ** 2).mean()
+        return np.sqrt(mse)
