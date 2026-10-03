@@ -31,11 +31,10 @@ class RegressionUtils:
         np.random.seed(seed)
         idx = np.arange(n)
         np.random.shuffle(idx)
-        df_shuffled = df_data.iloc[idx]
         
-        df_train = df_shuffled.iloc[idx[:n_train]].reset_index(drop=True)
-        df_val = df_shuffled.iloc[idx[n_train:n_train + n_val]].reset_index(drop=True)
-        df_test = df_shuffled.iloc[idx[n_train + n_val:]].reset_index(drop=True)
+        df_train = df_data.iloc[idx[:n_train]].reset_index(drop=True)
+        df_val = df_data.iloc[idx[n_train:n_train + n_val]].reset_index(drop=True)
+        df_test = df_data.iloc[idx[n_train + n_val:]].reset_index(drop=True)
         
         return df_train, df_val, df_test
 
