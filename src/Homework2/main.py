@@ -32,28 +32,22 @@ for r in [0, 0.01, 0.1, 1, 5, 10, 100]:
 	y_pred = w0 + X_val.dot(w)
 	print(f"# 4. R: {r} RMSE: {round(RegressionUtils.rmse(y_val, y_pred), 4)}")
 
-
-rmse = np.zeros(10)
-for seed in [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]:
+def rmse_variable_seed(seed):
 	df_train, df_val, df_test = RegressionUtils.split_data(df[BASE], seed)
-	
 	y_train, y_val, y_test = RegressionUtils.prepare_target(df_train, df_val, df_test, 'fuel_efficiency_mpg')
-	
 	X_train, X_val, X_test = RegressionUtils.prepare_data(df_train, df_val, df_test, 'fuel_efficiency_mpg', 0)
 	
 	w0, w = RegressionUtils.train_linear_regression(X_train, y_train)
 	y_pred = w0 + X_val.dot(w)
-	rmse[seed] = RegressionUtils.rmse(y_val, y_pred)
+	return RegressionUtils.rmse(y_val, y_pred)
 	
-print(f"# 5. STD: {round(np.std(rmse), 3)}")
-
+result = list(map(rmse_variable_seed, [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]))
+print(f"# 5. STD: {round(np.std(result), 3)}")
 
 df_train, df_val, df_test = RegressionUtils.split_data(df[BASE], 9)
 y_train, y_val, y_test = RegressionUtils.prepare_target(df_train, df_val, df_test, 'fuel_efficiency_mpg')
 
 X_train, X_val, X_test = RegressionUtils.prepare_data(df_train, df_val, df_test, 'fuel_efficiency_mpg', 0)
-
-print(X_train, X_val)
 
 X_full = np.concatenate([X_train, X_val])
 y_full = np.concatenate([y_train, y_val])
