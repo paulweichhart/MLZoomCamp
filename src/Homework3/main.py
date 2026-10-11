@@ -42,12 +42,12 @@ print("\n# 3. Mutual Information Score")
 for c in list(df_train.dtypes[CATEGORIAL].index):
 	print(f"between '{c}' and 'converted' { ClassificationUtils.calculate_mi(df_train, c, y_train) }")
 
-accuracy = ClassificationUtils.calculate_accuracy(df_train[CATEGORIAL + NUMERICAL], df_val[CATEGORIAL + NUMERICAL], y_train, y_val, 1.0)
+accuracy = ClassificationUtils.calculate_accuracy(df_train, df_val, y_train, y_val, 1.0)
 
 print(f"\n# 4. Accuracy of Model { accuracy }")
 
 print(f"\n# 5. Accuracy of Model")
-for c in list(df_train.dtypes[CATEGORIAL + NUMERICAL].index):
+for c in list(df_train.dtypes.index):
 	train_copy = df_train.copy()
 	val_copy = df_val.copy()
 	
@@ -59,5 +59,5 @@ for c in list(df_train.dtypes[CATEGORIAL + NUMERICAL].index):
 
 print("\n# 6. Accuracy with changing C Parameter")
 for c in [0.000001, 0.00001, 0.0001, 0.001]:
-	acc = ClassificationUtils.calculate_accuracy(train_copy, val_copy, y_train, y_val, c)
+	acc = ClassificationUtils.calculate_accuracy(df_train, df_val, y_train, y_val, c)
 	print(f"Accuracy of Model with '{c}' { acc } ")
