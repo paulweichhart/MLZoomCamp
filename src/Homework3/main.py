@@ -20,11 +20,8 @@ NUMERICAL = [
 	'interaction_count',
 	'lead_score']
 
-for c in list(df.dtypes.index):
-	if c in CATEGORIAL:
-		df[c] = df[c].fillna('NA')
-	else:
-		df[c] = df[c].fillna(0.0)
+for c in list(df.dtypes.index):		
+	df[c] = df[c].fillna('NA') if c in CATEGORIAL else df[c].fillna(0.0)
 
 print(f"\n# 1. Most Frequent industry observation {df.industry.mode()}")
 
@@ -43,7 +40,6 @@ for c in list(df_train.dtypes[CATEGORIAL].index):
 	print(f"between '{c}' and 'converted' { ClassificationUtils.calculate_mi(df_train, c, y_train) }")
 
 accuracy = ClassificationUtils.calculate_accuracy(df_train, df_val, y_train, y_val, 1.0)
-
 print(f"\n# 4. Accuracy of Model { accuracy }")
 
 print(f"\n# 5. Accuracy of Model")
