@@ -1,0 +1,14 @@
+pyproject.toml
+src/__init__.py
+src/Classification/notebook.py
+src/Homework1/main.py
+src/Homework2/RegressionUtils.py
+src/Homework2/main.py
+src/Homework3/ClassificationUtils.py
+src/Homework3/__init__.py
+src/Homework3/main.py
+src/LinearRegression/02-carprice.py
+src/MLzoomcamp.egg-info/PKG-INFO
+src/MLzoomcamp.egg-info/SOURCES.txt
+src/MLzoomcamp.egg-info/dependency_links.txt
+src/MLzoomcamp.egg-info/top_level.txt
