@@ -55,13 +55,13 @@ class ClassificationUtils:
 		
 	@staticmethod
 	def train_model(X_train, y_train, X_val, y_val, c):
-		model = LogisticRegression(solver='liblinear',C=c, max_iter=1000, random_state=42)
+		model = LogisticRegression(solver='liblinear',C=c, max_iter=1000)
 		model.fit(X_train, y_train)
 		
 		y_pred = model.predict_proba(X_val)[:, 1]
 		converted_decision = (y_pred >= 0.5)
 		
-		return (y_val == converted_decision).mean()
+		return y_pred, (y_val == converted_decision).mean()
 		
 	@staticmethod
 	def calculate_accuracy(df_train, df_val, y_train, y_val, c):

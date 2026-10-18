@@ -2,7 +2,7 @@
   "actions" : {
     "run" : {
       "enabled" : true,
-      "script" : "pytest tests\/Homework3\/test_ClassificationUtils.py && python3 src\/Homework3\/main.py"
+      "script" : "python3 src\/Homework4\/main.py"
     }
   },
   "openLogOnRun" : "finish",
