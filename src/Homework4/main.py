@@ -8,6 +8,8 @@ from sklearn.metrics import auc
 from sklearn.metrics import accuracy_score
 from sklearn.model_selection import KFold
 
+from tqdm.auto import tqdm
+
 from Homework3.ClassificationUtils import *
 
 df = pd.read_csv('data/course_lead_scoring_2026.csv')
@@ -30,7 +32,7 @@ NUMERICAL = [
 for c in list(df.dtypes.index):		
 	df[c] = df[c].fillna('NA') if c in CATEGORIAL else df[c].fillna(0.0)
 	
-df_train, df_val, df_test = ClassificationUtils.split_data(df)
+df_full_train, df_train, df_val, df_test = ClassificationUtils.split_data(df)
 y_train, y_val, y_test = ClassificationUtils.prepare_target(df_train, df_val, df_test, 'converted')
 df_train, df_val, df_test = ClassificationUtils.prepare_data(df_train, df_val, df_test, 'converted')
 
@@ -62,9 +64,11 @@ for t in thresholds:
 	fp = (predict_positive & actual_negative).sum()
 	fn = (predict_negative & actual_positive).sum()
 	
-	scores.append((t, tp, fp, fn, tn))
+	f1 = 2 * tp / (2 * tp + fp + fn) if (2 * tp + fp + fn) > 0 else 0
+	
+	scores.append((t, tp, fp, fn, tn, f1))
 
-columns = ['threshold', 'tp', 'fp', 'fn', 'tn']
+columns = ['threshold', 'tp', 'fp', 'fn', 'tn', 'f1']
 df_scores = pd.DataFrame(scores, columns=columns)
 
 df_scores['tpr'] = df_scores.tp / (df_scores.tp + df_scores.fn)
@@ -83,24 +87,31 @@ y_ideal_pred = np.linspace(0, 1, len(y_val))
 
 print(f" \n# 3. IDEAL { accuracy_score(y_ideal, y_ideal_pred >= (1 - y_val.mean())) } at Threshold ({ 1 - y_val.mean()})")
 
-f1 = np.zeros((2, 100))
-	
-for t in thresholds:
-	actual_positive = (y_val == 1)
-	actual_negative = (y_val == 0)
-	
-	predict_positive = (y_pred >= t)
-	predict_negative = (y_pred < t)
+print(f"\n# 4. Max F1 at { df_scores.f1.max() }")
 
-	tp = (predict_positive & actual_positive).sum()
-	tn = (predict_negative & actual_negative).sum()
+scores = []
 
-	fp = (predict_positive & actual_negative).sum()
-	fn = (predict_negative & actual_positive).sum()
+for C in [0.000001, 0.001, 1]:
+	kfold = KFold(n_splits=5, shuffle=True, random_state=1)
+
+	for train_idx, val_idx in kfold.split(df_full_train):
+		df_train_k = df_full_train.iloc[train_idx]
+		df_val_k = df_full_train.iloc[val_idx]
 	
-	precision = tp / (tp + fp)
-	recall = tp / (tp + fn)
-	result = 2 * (precision * recall) / (precision + recall)
-	print(f" {t} { round(result, 5)} ")
-	np.append(f1, [result, t])
+		y_train_k = df_train_k.converted.values
+		y_val_k = df_val_k.converted.values
+	
+		del df_train_k['converted']
+		del df_val_k['converted']
+	
+		dv, model = ClassificationUtils.train(df_train_k, y_train_k, C)
+		y_pred_k = ClassificationUtils.predict(df_val_k, dv, model)
+	
+		auc = roc_auc_score(y_val_k, y_pred_k)
+		scores.append(auc)
+
+	print('C=%s %.5f +- %.5f' % (C, np.mean(scores), np.std(scores)))
+
+
+# for C in tqdm([0.001, 0.007, 0.013, 0.06]):
 	

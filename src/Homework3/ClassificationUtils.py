@@ -17,14 +17,14 @@ class ClassificationUtils:
 		
 	@staticmethod
 	def split_data(df):
-		df_full_train, df_test = train_test_split(df, test_size=0.2, random_state=42)
-		df_train, df_val = train_test_split(df_full_train, test_size=0.25, random_state=42)
+		df_full_train, df_test = train_test_split(df, test_size=0.2, random_state=1)
+		df_train, df_val = train_test_split(df_full_train, test_size=0.25, random_state=1)
 		
 		df_train = df_train.reset_index(drop=True)
 		df_val = df_val.reset_index(drop=True)
 		df_test = df_test.reset_index(drop=True)
 		
-		return df_train, df_val, df_test
+		return df_full_train, df_train, df_val, df_test
 		
 	@staticmethod
 	def prepare_target(df_train, df_val, df_test, column):
@@ -55,7 +55,7 @@ class ClassificationUtils:
 		
 	@staticmethod
 	def train_model(X_train, y_train, X_val, y_val, c):
-		model = LogisticRegression(solver='liblinear',C=c, max_iter=1000)
+		model = LogisticRegression(solver='liblinear',C=1.0, max_iter=1000)
 		model.fit(X_train, y_train)
 		
 		y_pred = model.predict_proba(X_val)[:, 1]
@@ -71,3 +71,22 @@ class ClassificationUtils:
 		X_val = ClassificationUtils.ohe_data(df_val, dv, False)
 		
 		return ClassificationUtils.train_model(X_train, y_train, X_val, y_val, c)
+	
+	@staticmethod	
+	def train(df_train, y_train, C):
+		dicts = df_train.to_dict(orient='records')
+	
+		dv = DictVectorizer(sparse=False)
+		X_train = dv.fit_transform(dicts)
+	
+		model = LogisticRegression(solver='liblinear', C=C, max_iter=1000)
+		model.fit(X_train, y_train)
+	
+		return dv, model
+		
+	@staticmethod
+	def predict(df, dv, model):
+		dicts = df.to_dict(orient='records')
+	
+		X = dv.transform(dicts)
+		return model.predict_proba(X)[:, 1]
