@@ -89,11 +89,10 @@ print(f" \n# 3. IDEAL { accuracy_score(y_ideal, y_ideal_pred >= (1 - y_val.mean(
 
 print(f"\n# 4. Max F1 at { df_scores.f1.max() }")
 
-scores = []
 
 for C in [0.000001, 0.001, 1]:
 	kfold = KFold(n_splits=5, shuffle=True, random_state=1)
-
+	scores = []
 	for train_idx, val_idx in kfold.split(df_full_train):
 		df_train_k = df_full_train.iloc[train_idx]
 		df_val_k = df_full_train.iloc[val_idx]
@@ -110,8 +109,6 @@ for C in [0.000001, 0.001, 1]:
 		auc = roc_auc_score(y_val_k, y_pred_k)
 		scores.append(auc)
 
-	print('C=%s %.5f +- %.5f' % (C, np.mean(scores), np.std(scores)))
+	print('C=%s %.3f ' % (C, np.mean(scores)))
 
-
-# for C in tqdm([0.001, 0.007, 0.013, 0.06]):
 	
