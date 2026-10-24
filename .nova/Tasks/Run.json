@@ -2,7 +2,7 @@
   "actions" : {
     "run" : {
       "enabled" : true,
-      "script" : "python3 src\/Homework4\/main.py"
+      "script" : "python3 src\/Homework5\/main.py"
     }
   },
   "openLogOnRun" : "finish",

@@ -64,7 +64,7 @@ for t in thresholds:
 	fp = (predict_positive & actual_negative).sum()
 	fn = (predict_negative & actual_positive).sum()
 	
-	f1 = 2 * tp / (2 * tp + fp + fn) if (2 * tp + fp + fn) > 0 else 0
+	f1 = 2 * tp / (2 * tp + fp + fn) if (tp + fp + fn) > 0 else 0
 	
 	scores.append((t, tp, fp, fn, tn, f1))
 
@@ -87,7 +87,11 @@ y_ideal_pred = np.linspace(0, 1, len(y_val))
 
 print(f" \n# 3. IDEAL { accuracy_score(y_ideal, y_ideal_pred >= (1 - y_val.mean())) } at Threshold ({ 1 - y_val.mean()})")
 
-print(f"\n# 4. Max F1 at { df_scores.f1.max() }")
+max_f1_index = df_scores['f1'].idxmax()
+max_f1_threshold = df_scores.loc[max_f1_index, 'threshold']
+max_f1_value = df_scores.loc[max_f1_index, 'f1']
+
+print(f"\n# 4. Max F1 at {round(max_f1_value, 3)} with threshold {round(max_f1_threshold, 3)}")
 
 
 for C in [0.000001, 0.001, 1]:
